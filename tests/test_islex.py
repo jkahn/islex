@@ -10,8 +10,9 @@ Tests for `islex` module.
 
 import pytest
 
+import islex.token
 
-from islex import islex
+import islex.load
 
 
 class TestIslex(object):
@@ -26,4 +27,3 @@ class TestIslex(object):
     @classmethod
     def teardown_class(cls):
         pass
-
