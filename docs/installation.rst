@@ -49,3 +49,36 @@ Once you have a copy of the source, you can install it with:
 
 .. _Github repo: https://github.com/jkahn/islex
 .. _tarball: https://github.com/jkahn/islex/tarball/master
+
+
+Release checklist
+-----------------
+
+Update HISTORY.rst with release notes for *upcoming* release.
+Commit to master.
+  
+Check that everything still works:
+
+.. code-block:: console
+
+    $ make test-all
+
+Update the version number:
+
+.. code-block:: console
+
+    $ bumpversion patch  # or minor, or major?
+
+Make sure everything still works:
+
+.. code-block:: console
+
+    $ make test-all
+    
+Push the version bump and its tag up to the repo:
+
+.. code-block:: console
+
+    $ git push; git push --tags
+    
+Expect (if you're Jeremy) that travis will push the wheel to pypi.
