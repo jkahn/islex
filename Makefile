@@ -52,17 +52,15 @@ lint: ## check style with flake8
 
 test: ## run tests quickly with the default Python
 	py.test
-	
 
 test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source islex py.test
-	
-		coverage report -m
-		coverage html
-		$(BROWSER) htmlcov/index.html
+	py.test --cov=islex tests --cov-report=term --cov-report=html
+
+coverage-html: coverage ## report coverage in web browser window.
+	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/islex.rst
