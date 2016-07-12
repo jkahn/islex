@@ -28,7 +28,7 @@ Utility classes to support easy loading and manipulation of dictionary-to-pronun
 Features
 --------
 
-* TODO
+* Loading and navigating around the data structures of the ISLEX lexicon.
 
 Credits
 ---------
