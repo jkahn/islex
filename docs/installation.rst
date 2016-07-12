@@ -82,3 +82,8 @@ Push the version bump and its tag up to the repo:
     $ git push; git push --tags
     
 Expect (if you're Jeremy) that travis will push the wheel to pypi.
+
+Edit the release on Github
+(e.g. https://github.com/jkahn/islex/releases). Paste release notes
+into the release's release page, and come up with a title for the
+release.
