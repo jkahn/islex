@@ -15,7 +15,9 @@ Contents:
    installation
    usage
    contributing
-   authorshistory
+   roadmap
+   authors
+   history
 
 Indices and tables
 ==================

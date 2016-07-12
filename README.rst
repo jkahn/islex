@@ -33,8 +33,12 @@ Features
 Credits
 ---------
 
+Package author is `Jeremy G Kahn`_, repackaging the very useful ISLEX
+pronunciation lexicon.
+
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
+.. _`Jeremy G Kahn`: http://trochee.net/
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
 
