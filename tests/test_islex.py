@@ -10,7 +10,7 @@ Tests for `islex` module.
 
 import pytest
 
-import islex.token
+import islex.tokens
 
 import islex.load
 
