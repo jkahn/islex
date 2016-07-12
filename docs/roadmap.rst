@@ -12,4 +12,5 @@ Wishlist
 Improvements to automation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 * get coverage automation through travis.
-* port tweaks to template out into cookiecutter.
+* cherrypick tweaks to template out to separate ``package-automation`` branch
+* Port ``package-automation`` into a ``cookiecutter-pypackage`` fork.
