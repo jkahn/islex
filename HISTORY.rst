@@ -2,6 +2,13 @@
 History
 =======
 
+0.1.2 (unreleased)
+------------------
+
+* (intended difference with : release to PyPI done by Travis.)
+* (intention: dictionary shipped too.)
+
+
 0.1.1 (2016-07-12)
 ------------------
 
