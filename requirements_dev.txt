@@ -9,4 +9,4 @@ Sphinx==1.4.5
 PyYAML==3.11
 pytest==2.9.2
 pytest-cov==2.3.0
-check-manifest
+check-manifest==0.31
