@@ -2,11 +2,11 @@
 History
 =======
 
-0.1.2 (unreleased)
+0.1.2 (2016-07-20)
 ------------------
 
 * (intended difference with : release to PyPI done by Travis.)
-* (intention: dictionary shipped too.)
+* Refactor to use `attrs` classes for clean, fast types.
 
 
 0.1.1 (2016-07-12)

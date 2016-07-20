@@ -1,117 +1,224 @@
 # -*- coding: utf-8 -*-
 
-from collections import namedtuple
+import attr
+from attr.validators import optional, instance_of
 import re
+from six import text_type as unicode
+import enum
+import itertools
 
 
-class Ortho(namedtuple('Ortho', ['ortho', 'pos'])):
-    """Munges the orthographic & POS section"""
-    def to_string(self):
-        return self.ortho + "(" + self.pos + ")"
-    patt = re.compile(r'^([^\(]+?)\((.*)\)\s*$')
+@enum.unique
+class PosCategory(enum.Enum):
+    """Enumeration of possible POS tags."""
+    UNUSED_POSTAG = 0
+
+    # Adverbs, and comparative/superlative forms.
+    RB = 1
+    RBR = 2
+    RBS = 3
+
+    # (Common) nouns.
+    NN = 4
+    NNS = 5
+
+    # Adjectives in various forms (incl comparative & superlative).
+    JJ = 6
+    JJR = 7
+    JJS = 8
+
+    # Verbs in various conjugations.
+    VB = 9
+    VBD = 10
+    VBG = 11
+    VBP = 12
+    VBN = 13
+    VBZ = 14
+
+    # Proper nouns.
+    NNP = 15
+    NNPS = 16
+
+    # Discourse markers.
+    LS = 20
+    FW = 21
+    UH = 22
+
+    # Various closed-class items.
+    DT = 50  # Determiners.
+    EX = 51  # Existential there.
+    CD = 52  # Count determiner?
+    MD = 53
+    IN = 54
+    TO = 55
+    OF = 56
+    PRP = 57
+    CC = 58
+    PDT = 59
+    WRB = 60
+    WDT = 61
+    WP = 62
+    RP = 63
+
+    # Symbol?
+    ABBREVIATION = 80
+    SYM = 81
+    PUNC = 82
+
+
+@enum.unique
+class EntityCategory(enum.Enum):
+    UNSPECIFIED_ENTITY = 0
+    PRODUCT = 1
+    CITY = 2
+    SURNAME = 3
+    EVENT = 4
+    COUNTRY = 5
+    CONTINENT = 6
+    PERSON = 7
+    ORGANIZATION = 8
+    COMPANY = 9
+    PLACE = 10
+    STATE = 11
+    MONTH = 12
+    BOYNAME = 13
+    GIRLNAME = 14
+
+
+_scored_patt = re.compile(r'_\d\.\d+$')
+
+
+def _clean_tag(t):
+    """Fix up some garbage errors."""
+    # TODO: when score present, include info.
+    t = _scored_patt.sub(string=t, repl='')
+    if t == '_country_' or t.startswith('_country:'):
+        t = 'nnp_country'
+    elif t == 'vpb':
+        t = 'vb'  # "carjack" is listed with vpb tag.
+    elif t == 'nnd':
+        t = 'nns'  # "abbes" is listed with nnd tag.
+    elif t == 'nns_root:':
+        t = 'nns'  # 'micros' is listed as nns_root.
+    elif t == 'root:zygote':
+        t = 'nn'  # 'root:zygote' for zygote. :-/
+    elif t.startswith('root:'):
+        t = 'uh'  # Don't know why, but these are all UH tokens.
+    elif t in ('abbr_united_states_marine_corps', 'abbr_orange_juice'):
+        t = "abbreviation"
+    elif t == '+abbreviation':
+        t = 'abbreviation'
+    elif t.startswith('fw_misspelling:'):
+        t = 'fw'
+    return t
+
+
+@attr.s
+class Pos(object):
+    category = attr.ib(validator=instance_of(PosCategory))
+    entity_type = attr.ib(default=None,
+                          validator=optional(instance_of(EntityCategory)))
 
     @classmethod
-    def from_string(cls, s):
-        match = cls.patt.match(s)
-        if match:
-            ortho, pos = match.groups()
-            # might want to do more with the pos parsing, maybe ortho too.
-            return cls(ortho=ortho, pos=pos)
+    def from_string(cls, t):
+        # Extract some systematic structure from the data.
+        postag = t
+        entity = None
+        if t.startswith('nnp_'):
+            postag = PosCategory.NNP
+            entity = EntityCategory[t[4:].upper()]
+        elif t.startswith('nnps_'):
+            postag = PosCategory.NNPS
+            entity = EntityCategory[t[5:].upper()]
         else:
-            raise ValueError("Word %s doesn't seem to have ortho pattern" % s)
+            postag = PosCategory[t.upper()]
+            entity = None
+        return cls(category=postag, entity_type=entity)
 
 
-class Consonant(namedtuple('Consonant', ['phone'])):
-    """Contains consonant features."""
-
-    def to_string(self):
-        return self.phone
-    # TODO: support (e.g.) is_voiced(), etc.
-
-
-class Vowel(namedtuple('Vowel', ['phone', 'stress'])):
-    @classmethod
-    def is_vowel(cls, s):
-        if '=' in s:  # Syllabic l:  l= etc
-            return True  # Syllable nucleus
-        if '@' in s or '&' in s or '^' in s:
-            return True
-        # TODO: Needs more attention to handle other vowels (in
-        # unstressed syllables).
-        return
-
-    def to_string(self):
-        stress = None
-        if self.stress == 'primary':
-            stress = "'"
-        elif self.stress == 'secondary':
-            stress = ','
-        elif self.stress == '0':
-            stress = ''
-        else:
-            raise ValueError("vowel doesn't have right stress")
-        return self.phone + stress
-    # TODO: support (e.g.) is_front, is_back, etc.
-
-
+@attr.s
 class Phone(object):
+    value = attr.ib(instance_of(unicode))
+
+
+@attr.s
+class Syllable(object):
+    phones = attr.ib(instance_of(tuple))  # of strings? of Phones?
+
     @classmethod
     def from_string(cls, s):
-        if s.endswith("'"):
-            return Vowel(s[:-1], stress='primary')
-        elif s.endswith(","):
-            return Vowel(s[:-1], stress='secondary')
-        elif Vowel.is_vowel(s):
-            return Vowel(s, stress='0')
-        else:
-            return Consonant(s)
+        return cls(phones=tuple(Phone(value=p) for p in s.split()))
+
+    @property
+    def ipa(self):
+        return tuple(ph.value for ph in self.phones)
 
 
-class Syll(namedtuple('Syll', ['phones'])):
-    """Model of syllable"""
+@attr.s
+class Pron(object):
+    sylls = attr.ib(validator=instance_of(tuple))
+
     @classmethod
-    def from_string(cls, s):
-        return cls(phones=[Phone.from_string(p.strip()) for p in s.split()])
+    def from_string(cls, s, clean=False):
+        s = s.strip()
+        raw_sylls = s.split(u' . ')
+        if clean:
+            raw_sylls = [p.replace(u"ɛ̃", u"ɛ") for p in raw_sylls]
+        # TODO: break into phones?
+        return cls(sylls=tuple(Syllable.from_string(p) for p in raw_sylls))
 
-    def to_string(self):
-        return " ".join([p.to_string() for p in self.phones])
-    # TODO: support (e.g.) onset, nucleus, coda, rhyme methods.
+    @property
+    def ipa(self):
+        return tuple(itertools.chain.from_iterable(syll.ipa
+                                                   for syll in self.sylls))
 
 
-class Phon(namedtuple('Phon', ['sylls'])):
-    """Phonetic representation of entire word."""
+@attr.s
+class Word(object):
+    ortho = attr.ib()
+    pos = attr.ib(validator=instance_of(tuple))  # of Pos
+    morphs = attr.ib(validator=instance_of(tuple))  # of strings
+    # TODO: validate that each element is instance of...
+    prons = attr.ib(validator=instance_of(tuple))  # of Prons
+
+    ortho_patt = re.compile(r'^([^\(]+?)\((.*)\)\s*$')
+
     @classmethod
-    def from_string(cls, s):
-        return cls(sylls=[Syll.from_string(sy) for sy in s.split('.')])
+    def from_string(cls, s, clean=False):
+        s = s.strip()
+        raw_prons = s.split(u'#')
+        while not raw_prons[-1]:
+            raw_prons.pop(-1)
+        if len(raw_prons) < 2:
+            raise ValueError("string doesn't have enough segments: %s" % s)
+        raw_ortho = raw_prons.pop(0)
+        m = cls.ortho_patt.match(raw_ortho)
+        if not m:
+            raise ValueError("ortho doesn't match expected" % raw_ortho)
+        ortho, raw_pos = m.groups()
+        all_morphs = []
+        all_pos = []
+        for t in raw_pos.split(','):
+            if clean:
+                t = _clean_tag(t)
+            if not t:
+                continue
+            if t.startswith('+'):
+                assert not all_morphs
+                all_morphs = t[1:].split('+')
+            else:
+                try:
+                    all_pos.append(Pos.from_string(t))
+                except KeyError as k:
+                    raise ValueError("pos tag %s not found" % k)
 
-    def to_string(self):
-        return ' . '.join([s.to_string() for s in self.sylls])
+        all_prons = [Pron.from_string(raw_pron, clean=clean)
+                     for raw_pron in raw_prons]
 
+        return cls(ortho=ortho, morphs=tuple(all_morphs), pos=tuple(all_pos),
+                   prons=tuple(all_prons))
 
-class Word(namedtuple('Word', ['ortho', 'phons'])):
-    @classmethod
-    def from_line(cls, l):
-        l = l.rstrip()
-        _prons = str.split(l, '#')
-        ortho = _prons.pop(0)
-        while not _prons[-1]:
-            _prons.pop(-1)
-        return cls(ortho=Ortho.from_string(ortho),
-                   phons=[Phon.from_string(p) for p in _prons])
-
-    def to_string(self):
-        return " # ".join([self.ortho.to_string()]
-                          + [p.to_string() for p in self.phons])
-
-    def to_phones(self, by_syllables=False):
-        out = []
-        for phon in self.phons:
-            for syll in phon.sylls:
-                syll_phones = []
-                for phone in syll.phones:
-                    syll_phones.append(phone.phone)
-                if by_syllables:
-                    out.append(syll_phones)
-                else:
-                    out.extend(syll_phones)
-        return tuple(out)
+    @property
+    def ipa(self):
+        return tuple(itertools.chain.from_iterable(
+            pron.ipa for pron in self.prons))
