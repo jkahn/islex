@@ -6,7 +6,7 @@ History
 ------------------
 
 * Improved handling of morphologically-analyzed words.
-* (Include behaviors to restore to strings.)
+* Include behaviors to restore to strings.
 
 
 0.1.2 (2016-07-20)

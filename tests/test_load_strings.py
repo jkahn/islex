@@ -17,18 +17,26 @@ from islex.tokens import Word, Pos, Pron, Syllable, Morph, Phone, \
 
 class TestMorphology(object):
     test_str = (u"individually(+individual+ly,+individual+y,jj,rb) "
-                + u"# ˌɪ n . d ə . v ˈɪ . dʒ u . ə . l i #")
+                + u"# ˌɪ n . d ə . v ˈɪ . dʒ u . ə . l i")
+
     def test_morph_structures(self):
         word = Word.from_string(self.test_str)
         assert len(word.morphs) == 2
         assert word.morphs[0] == Morph(emes=("individual", "ly"))
         assert word.morphs[1] == Morph(emes=("individual", "y"))
 
+    def test_restringify(self):
+        w = Word.from_string(self.test_str)
+        assert w.to_string() == self.test_str
+        assert Word.from_string(w.to_string()) == w
+
 
 class TestIsleWord(object):
 
     test_str = (u"007(+abbreviation,nnp_person) # "
                 + u"d ˌʌ . b ə l . ˌoʊ . s ˌɛ̃ . v ˌɪ n #")
+    cleaned_str = (u"007(abbreviation,nnp_person) # "
+                   + u"d ˌʌ . b ə l . ˌoʊ . s ˌɛ . v ˌɪ n")
     syllables = (Syllable.from_string(u'd ˌʌ'),
                  Syllable.from_string(u'b ə l'),
                  Syllable.from_string(u'ˌoʊ'),
@@ -36,7 +44,7 @@ class TestIsleWord(object):
                  Syllable.from_string(u'v ˌɪ n'))
 
     phones = tuple(u"d ˌʌ b ə l ˌoʊ s ˌɛ v ˌɪ n".split())
-    
+
     @classmethod
     def setup_class(cls):
         pass
@@ -53,6 +61,11 @@ class TestIsleWord(object):
         assert len(w.prons) == 1
         assert len(w.pos) == 0
 
+    def test_restringify(self):
+        w = Word.from_string(self.test_str, clean=True)
+        assert w.to_string() == self.cleaned_str
+        assert Word.from_string(self.cleaned_str) == w
+
     def test_morph_scheme(self):
         s = u"fooed(+foo+ed,vbd) # f  ˈu d #"
         w = Word.from_string(s)
@@ -61,7 +74,7 @@ class TestIsleWord(object):
         assert w.pos[0] == Pos(category=PosCategory.VBD)
         assert len(w.morphs) == 1
         assert w.morphs[0] == Morph(emes=("foo", "ed"))
-        
+
     def test_pos_tags(self):
         word = Word.from_string(self.test_str, clean=True)
         assert len(word.pos) == 2
@@ -73,15 +86,15 @@ class TestIsleWord(object):
     def test_syllable(self):
         assert Syllable.from_string(u'v ˌɪ n') == Syllable(
             phones=(Phone(u'v'), Phone(u'ˌɪ'), Phone(u'n')))
-        
+
     def test_ipa(self):
         word = Word.from_string(self.test_str, clean=True)
         assert word.ipa == self.phones
-        
+
     @pytest.mark.skip("No syllable functionality yet")
     def test_stress(self):
         vin = Syllable.from_string(u'v ˌɪ n')
-        assert vin.onset == [Phone(u'v'),]
+        assert vin.onset == [Phone(u'v'), ]
         assert vin.coda == [Phone(u'ˌɪ'), Phone(u'n')]
         assert vin.is_stressed
         assert not vin.is_primary_stressed

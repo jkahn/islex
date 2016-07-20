@@ -115,6 +115,7 @@ def _clean_tag(t):
 
 @attr.s
 class Pos(object):
+    """Contains part of speech information and (possibly) entity category."""
     category = attr.ib(validator=instance_of(PosCategory))
     entity_type = attr.ib(default=None,
                           validator=optional(instance_of(EntityCategory)))
@@ -135,6 +136,12 @@ class Pos(object):
             entity = None
         return cls(category=postag, entity_type=entity)
 
+    def to_string(self):
+        out = self.category.name.lower()
+        if self.entity_type is not None:
+            out += u'_' + self.entity_type.name.lower()
+        return out
+
 
 @attr.s
 class Morph(object):
@@ -148,6 +155,9 @@ class Morph(object):
     def from_string(cls, s):
         morphemes = (m for m in s.split('+') if len(m))
         return cls(emes=tuple(morphemes))
+
+    def to_string(self):
+        return u'+' + u'+'.join(self.emes)
 
 
 @attr.s
@@ -168,6 +178,9 @@ class Syllable(object):
     def ipa(self):
         return tuple(ph.value for ph in self.phones)
 
+    def to_string(self):
+        return u" ".join(ph.value for ph in self.phones)
+
 
 @attr.s
 class Pron(object):
@@ -186,6 +199,9 @@ class Pron(object):
     def ipa(self):
         return tuple(itertools.chain.from_iterable(syll.ipa
                                                    for syll in self.sylls))
+
+    def to_string(self):
+        return u' . '.join(syll.to_string() for syll in self.sylls)
 
 
 @attr.s
@@ -231,6 +247,11 @@ class Word(object):
 
         return cls(ortho=ortho, morphs=tuple(all_morphs), pos=tuple(all_pos),
                    prons=tuple(all_prons))
+
+    def to_string(self):
+        morph_pos = ','.join([m.to_string() for m in self.morphs + self.pos])
+        key = u'%s(%s)' % (self.ortho, morph_pos)
+        return u' # '.join([key] + [p.to_string() for p in self.prons])
 
     @property
     def ipa(self):
