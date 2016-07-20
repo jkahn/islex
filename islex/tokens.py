@@ -137,7 +137,22 @@ class Pos(object):
 
 
 @attr.s
+class Morph(object):
+    """Contains a morphological analysis of the corresponding ortho.
+
+    May be more than one in a word, e.g. axes -> (ax + s), (axe + s)
+    """
+    emes = attr.ib(validator=instance_of(tuple))  # of strings
+
+    @classmethod
+    def from_string(cls, s):
+        morphemes = (m for m in s.split('+') if len(m))
+        return cls(emes=tuple(morphemes))
+
+
+@attr.s
 class Phone(object):
+    """Contains a cluster of IPA characters indicating a single phone(me)."""
     value = attr.ib(instance_of(unicode))
 
 
@@ -177,7 +192,7 @@ class Pron(object):
 class Word(object):
     ortho = attr.ib()
     pos = attr.ib(validator=instance_of(tuple))  # of Pos
-    morphs = attr.ib(validator=instance_of(tuple))  # of strings
+    morphs = attr.ib(validator=instance_of(tuple))  # of Morph objects
     # TODO: validate that each element is instance of...
     prons = attr.ib(validator=instance_of(tuple))  # of Prons
 
@@ -204,8 +219,7 @@ class Word(object):
             if not t:
                 continue
             if t.startswith('+'):
-                assert not all_morphs
-                all_morphs = t[1:].split('+')
+                all_morphs.append(Morph.from_string(t))
             else:
                 try:
                     all_pos.append(Pos.from_string(t))

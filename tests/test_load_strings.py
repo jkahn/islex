@@ -11,8 +11,18 @@ Tests for `islex.tokens` module.
 from six import text_type as unicode
 import pytest
 
-from islex.tokens import Word, Pos, Pron, Syllable, Phone, \
+from islex.tokens import Word, Pos, Pron, Syllable, Morph, Phone, \
     PosCategory, EntityCategory
+
+
+class TestMorphology(object):
+    test_str = (u"individually(+individual+ly,+individual+y,jj,rb) "
+                + u"# ˌɪ n . d ə . v ˈɪ . dʒ u . ə . l i #")
+    def test_morph_structures(self):
+        word = Word.from_string(self.test_str)
+        assert len(word.morphs) == 2
+        assert word.morphs[0] == Morph(emes=("individual", "ly"))
+        assert word.morphs[1] == Morph(emes=("individual", "y"))
 
 
 class TestIsleWord(object):
@@ -49,8 +59,8 @@ class TestIsleWord(object):
         assert len(w.prons) == 1
         assert len(w.pos) == 1
         assert w.pos[0] == Pos(category=PosCategory.VBD)
-        assert len(w.morphs) == 2
-        assert w.morphs == ("foo", "ed")
+        assert len(w.morphs) == 1
+        assert w.morphs[0] == Morph(emes=("foo", "ed"))
         
     def test_pos_tags(self):
         word = Word.from_string(self.test_str, clean=True)

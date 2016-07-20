@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import codecs
+from six import text_type as unicode
 from collections import defaultdict
 
 from islex.tokens import Word
@@ -13,7 +14,7 @@ def generate_words(clean=False):
         try:
             yield Word.from_string(l, clean=clean)
         except ValueError as v:
-            print v.encode('utf-8')
+            print unicode(v).encode('utf-8')
             continue
 
 
