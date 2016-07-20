@@ -1,3 +1,3 @@
 attrs
-enum34
+enum34==1.1.6
 six
