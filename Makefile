@@ -57,7 +57,7 @@ test: ## run tests quickly with the default Python
 	py.test
 
 test-all: ## run tests on every Python version with tox
-	check-manifest
+	-check-manifest
 	python setup.py check -r -s
 	tox
 
