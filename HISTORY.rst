@@ -2,13 +2,13 @@
 History
 =======
 
-0.1.3 (unreleased)
+0.2.0 (2016-07-26)
 ------------------
 
+* Constructs islex.data namespace for other packages to land in.
 * Improved handling of morphologically-analyzed words.
 * Include behaviors to restore to strings.
-* Include functions to write to internal files.
-* Constructs islex.data namespace for other packages to land in.
+* Include functions to write to external files for managing data as subpackages.
 * codecov support
 
 
