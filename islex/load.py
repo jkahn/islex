@@ -12,9 +12,12 @@ from collections import defaultdict
 from islex.tokens import Word, PosCategory
 
 ISLE_FILE = '/opt/data/ISLEdict.txt'
-CORE_FILE = os.path.join(os.path.dirname(__file__), 'core.bz2')
-ENTITIES_FILE = os.path.join(os.path.dirname(__file__), 'entities.bz2')
-PERIPHERY_FILE = os.path.join(os.path.dirname(__file__), 'periphery.bz2')
+
+# TODO(jkahn): fetch these from namespace packages using official packagers
+CORE_FILE = os.path.join(os.path.dirname(__file__), 'data', 'core.bz2')
+ENTITIES_FILE = os.path.join(os.path.dirname(__file__), 'data', 'entities.bz2')
+PERIPHERY_FILE = os.path.join(os.path.dirname(__file__), 'data',
+                              'periphery.bz2')
 
 
 def _open_package_files(mode='r'):

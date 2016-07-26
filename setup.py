@@ -30,7 +30,8 @@ setup(
     ],
     package_dir={'islex':
                  'islex'},
-    package_data={'islex': ['islex/{core,entities,periphery}.bz2']},
+    package_data={'islex': ['islex/data/{core,entities,periphery}.bz2'],
+                  },
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",

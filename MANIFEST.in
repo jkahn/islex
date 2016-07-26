@@ -4,6 +4,8 @@ include HISTORY.rst
 include LICENSE
 include README.rst
 
+recursive-include islex/data *.py
+recursive-include islex/data *.bz2
 recursive-include tests *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
@@ -12,5 +14,3 @@ recursive-include docs *.rst conf.py Makefile make.bat *.jpg *.png *.gif
 
 include tox.ini
 include *.txt
-
-include islex/*.bz2
