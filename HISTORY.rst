@@ -7,8 +7,9 @@ History
 
 * Improved handling of morphologically-analyzed words.
 * Include behaviors to restore to strings.
-* Include functions to write to internal bzip files.
-* (coverio)
+* Include functions to write to internal files.
+* Constructs islex.data namespace for other packages to land in.
+* codecov support
 
 
 0.1.2 (2016-07-20)

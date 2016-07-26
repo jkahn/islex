@@ -2,33 +2,30 @@
 
 from __future__ import print_function
 
-import bz2
-import itertools
 import os.path
 
 from six import text_type as unicode
-from collections import defaultdict
 
 from islex.tokens import Word, PosCategory
 
 ISLE_FILE = '/opt/data/ISLEdict.txt'
 
-# TODO(jkahn): fetch these from namespace packages using official packagers
-CORE_FILE = os.path.join(os.path.dirname(__file__), 'data', 'core.bz2')
-ENTITIES_FILE = os.path.join(os.path.dirname(__file__), 'data', 'entities.bz2')
-PERIPHERY_FILE = os.path.join(os.path.dirname(__file__), 'data',
-                              'periphery.bz2')
+CHECKOUT_ROOT = os.path.join(os.environ['HOME'], 'src')
 
 
-def _open_package_files(mode='r'):
-    core = bz2.BZ2File(CORE_FILE, mode=mode)
-    entities = bz2.BZ2File(ENTITIES_FILE, mode=mode)
-    periphery = bz2.BZ2File(PERIPHERY_FILE, mode=mode)
-    return core, entities, periphery
+def _open_data_package_target(stem):
+    islex_path = 'islex-%s' % stem
+    package_dir = os.path.join(CHECKOUT_ROOT, islex_path, islex_path)
+    if not os.path.exists(package_dir):
+        os.makedirs(package_dir)
+    f = os.path.join(package_dir, 'entries.txt')
+    return open(f, mode='w')
 
 
 def write_package_data():
-    core, entities, periphery = _open_package_files(mode='w')
+    core = _open_data_package_target('core')
+    entities = _open_data_package_target('entities')
+    periphery = _open_data_package_target('periphery')
 
     def is_unambiguous_entity(w):
         ENTITY_CATEGORIES = (PosCategory.ABBREVIATION, PosCategory.NNP,
@@ -46,19 +43,6 @@ def write_package_data():
         out.write(w.to_string().encode('utf-8') + "\n")
 
 
-def stream_entries(core=True, entities=True, periphery=True):
-    core_f, entities_f, periphery_f = _open_package_files()
-    files = []
-    if core:
-        files.append(core_f)
-    if entities:
-        files.append(entities_f)
-    if periphery:
-        files.append(periphery_f)
-
-    return itertools.chain.from_iterable(stream_from_fh(fh) for fh in files)
-
-
 def stream_from_fh(fh, clean=False):
     for l in fh:
         l = l.decode('utf-8')
@@ -67,18 +51,3 @@ def stream_from_fh(fh, clean=False):
         except ValueError as v:
             print(unicode(v).encode('utf-8'))
             continue
-
-
-def index_on_ortho(stream):
-    """returns ortho: all Word objects with that ortho"""
-    mmap = defaultdict(list)
-    for w in stream:
-        mmap[w.ortho].append(w)
-    return mmap
-
-
-def index_on_phones(stream):
-    mmap = defaultdict(list)
-    for w in stream:
-        mmap[w.ipa].append(w)
-    return mmap
