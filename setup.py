@@ -19,7 +19,7 @@ test_requirements = [
 
 setup(
     name='islex',
-    version='0.1.2',
+    version='0.2.0',
     description="Utility classes to support easy loading and manipulation of dictionary-to-pronunciation.",
     long_description=readme + '\n\n' + history,
     author="Jeremy G. Kahn",
