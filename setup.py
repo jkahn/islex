@@ -33,7 +33,7 @@ setup(
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",
-    zip_safe=False,
+    zip_safe=True,
     keywords='islex',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',

@@ -2,6 +2,13 @@
 History
 =======
 
+0.2.1 (2016-07-26)
+------------------
+
+* Mark as zip-safe.
+* Correct some loading code to work better for subpackages.
+
+
 0.2.0 (2016-07-26)
 ------------------
 

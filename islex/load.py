@@ -10,7 +10,8 @@ from islex.tokens import Word, PosCategory
 
 ISLE_FILE = '/opt/data/ISLEdict.txt'
 
-CHECKOUT_ROOT = os.path.join(os.environ['HOME'], 'src')
+# TODO(jkahn): this is obviously only going to work for me.
+CHECKOUT_ROOT = '/home/jeremy/src'
 
 
 def _open_data_package_target(stem):
