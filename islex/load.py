@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 
+import collections
 import os.path
 
 from six import text_type as unicode
@@ -52,3 +53,37 @@ def stream_from_fh(fh, clean=False):
         except ValueError as v:
             print(unicode(v).encode('utf-8'))
             continue
+
+class ReadOnlyMapping(collections.Mapping):
+    def __init__(self, backing_store):
+        assert isinstance(backing_store, collections.Mapping)
+        self._store = backing_store
+
+    def __getitem__(self, key):
+        return self._store[key]
+
+    def __iter__(self):
+        return iter(self._store)
+
+    def __len__(self):
+        return len(self._store)
+
+
+class CaseInsensitiveMapping(ReadOnlyMapping):
+    # Note: assumes that all keys in backing store are already lowercased
+    def __getitem__(self, key):
+        return self._store[key.lower()]
+
+
+MEMOIZED_MAPPINGS = {}
+
+def ortho_mapping(module):
+    if module not in MEMOIZED_MAPPINGS:
+        d = dict()
+        for w in module.entries_stream():
+            orth = w.ortho.lower()
+            if orth not in d:
+                d[orth] = []
+                d[orth].append(w)
+        MEMOIZED_MAPPINGS[module] = CaseInsensitiveMapping(backing_store=d)
+    return MEMOIZED_MAPPINGS[module]
