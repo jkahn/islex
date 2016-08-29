@@ -14,5 +14,5 @@ And the loading module is found in::
 
     import islex.load
 
-Data itself is generated from ``/opt/data/islev2.txt`` which is
-retrieved from the web in this version.
+Data itself is generated from ISLE dictionary downloads found in supporting
+projects ``islex-core``, ``islex-periphery``, and ``islex-entities``.
