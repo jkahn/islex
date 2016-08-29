@@ -54,6 +54,7 @@ def stream_from_fh(fh, clean=False):
             print(unicode(v).encode('utf-8'))
             continue
 
+
 class ReadOnlyMapping(collections.Mapping):
     def __init__(self, backing_store):
         assert isinstance(backing_store, collections.Mapping)
@@ -76,6 +77,7 @@ class CaseInsensitiveMapping(ReadOnlyMapping):
 
 
 MEMOIZED_MAPPINGS = {}
+
 
 def ortho_mapping(module):
     if module not in MEMOIZED_MAPPINGS:

@@ -2,6 +2,13 @@
 History
 =======
 
+0.2.2 (2016-08-28)
+------------------
+
+* Support read-only lazy loading of case-insensitive mappings from
+  orthography.
+* Docs fixes.
+
 0.2.1 (2016-07-26)
 ------------------
 
