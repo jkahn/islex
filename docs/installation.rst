@@ -14,7 +14,11 @@ To install ISLEX pronunciation dictionary accessors, run this command in your te
 
     $ pip install islex
 
-This is the preferred method to install ISLEX pronunciation dictionary accessors, as it will always install the most recent stable release. 
+This is the preferred method to install ISLEX pronunciation dictionary
+accessors, as it will always install the most recent stable release.
+
+This package is tested for support on Python 2.7+, Python 3.4+, and
+current PyPy.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -56,7 +60,7 @@ Release checklist
 
 Update HISTORY.rst with release notes for *upcoming* release.
 Commit to master.
-  
+
 Check that everything still works:
 
 .. code-block:: console
@@ -74,13 +78,13 @@ Make sure everything still works:
 .. code-block:: console
 
     $ make test-all
-    
+
 Push the version bump and its tag up to the repo:
 
 .. code-block:: console
 
     $ git push; git push --tags
-    
+
 Expect (if you're Jeremy) that travis will push the wheel to pypi.
 
 Edit the release on Github
