@@ -2,6 +2,11 @@
 History
 =======
 
+0.2.5 (2020-12-23)
+------------------
+* updating a bunch of dependent modules and trying to remember how everything works in 
+  in the new world
+
 0.2.2 (2016-08-28)
 ------------------
 

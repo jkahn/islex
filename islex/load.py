@@ -46,10 +46,10 @@ def write_package_data():
 
 
 def stream_from_fh(fh, clean=False):
-    for l in fh:
-        l = l.decode('utf-8')
+    for ln in fh:
+        ln = ln.decode('utf-8')
         try:
-            yield Word.from_string(unicode(l), clean=clean)
+            yield Word.from_string(unicode(ln), clean=clean)
         except ValueError as v:
             print(unicode(v).encode('utf-8'))
             continue
